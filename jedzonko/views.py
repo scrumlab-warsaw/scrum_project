@@ -22,14 +22,33 @@ def main_page(request):
     return render(request, "index.html")
 
 
+def recipe_details(request, recipe_id):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
+
 def recipe_list(request):
-    return HttpResponse("")
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
 
 
 def plan_list(request):
-    return HttpResponse("")
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
 
 
 def recipe_add(request):
-    return HttpResponse("")
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
 
+
+def recipe_modify(request, recipe_id):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
+
+def plan_details(request, plan_id):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
+
+def plan_add(request):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
+
+def add_recipe_to_plan(request):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
