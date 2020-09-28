@@ -8,7 +8,7 @@ RECIPE_DATA = (
      'Aromatyczna, świeża, pełna ziół i różnorodnych smaków – sałatka z serem pavé, owocami i sosem na bazie octu balsamicznego sprawi, że zakochasz się w kuchni francuskiej!',
      35),
     ('Zapiekanka ziemniaczana',
-     'ziemniaki bio, pieczarki, śmietanka, suszone pomidory w oleju, olej po suszonych pomidorach, cebula, czosnek, natka pietruszki, majeranek, świeży rozmaryn, olej słonecznikowy, masło, grana padano, sól, pieprz'
+     'ziemniaki bio, pieczarki, śmietanka, suszone pomidory w oleju, olej po suszonych pomidorach, cebula, czosnek, natka pietruszki, majeranek, świeży rozmaryn, olej słonecznikowy, masło, grana padano, sól, pieprz',
      'Na spotkanie ze znajomymi, na rodzinny obiad – zapiekanka ziemniaczana to szybkie, proste i sycące danie na wiele okazji! Upiecz ją i sprawdź, jak smakuje!',
      90),
     ('Wegańskie ciasteczka imbirowe',
@@ -16,7 +16,7 @@ RECIPE_DATA = (
      'Są wegańskie, imbirowe i przypominają renifery! Te ciasteczka na pewno zasmakują wszystkim, nie tylko najmłodszym fanom mikołajkowych słodkości! ',
      35),
     ('Naleśniki z twarożkiem',
-     'mąka przenna, twarożek, mleko, jajka, masło, bita śmietana, owoce, cukier'
+     'mąka przenna, twarożek, mleko, jajka, masło, bita śmietana, owoce, cukier',
      'Te przepyszne naleśniki są idealne na niedzielne śniadanie!',
      30),
     ('Soba stir fry z wołowiną',
@@ -38,5 +38,5 @@ RECIPE_DATA = (
     ('Kajmakowy deser tiramisu',
      'serek mascarpone, ubita śmietanka UHT, masa kajmakowa, mocne espresso, owoce lasu w syropie, syrop z owoców lasu, ciasteczka amaretti, kakao, świeże maliny, świeża mięta',
      'Aksamitny krem kajmakowy, owoce lasu, ciasteczka i wyczuwalny smak mocnej kawy – oto składniki prostego, kuszącego deseru, który przygotujesz dzięki przepisowi Pawła!',
-     30)
+     30),
 )
