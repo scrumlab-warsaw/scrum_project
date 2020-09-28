@@ -1,8 +1,11 @@
 from datetime import datetime
+from random import shuffle
 
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
+
+from jedzonko.models import Recipe
 
 
 class IndexView(View):
@@ -18,5 +21,7 @@ class Dashobard(View):
         return render(request, 'dashboard.html')
 
 def main_page(request):
-    return render(request, "index.html")
+    recipes = [recipe for recipe in Recipe.objects.all()]
+    shuffle(recipes)
+    return render(request, "index.html", {'recipes': recipes[:3], 'active_carousel_recipe_name': recipes[0].name})
 
