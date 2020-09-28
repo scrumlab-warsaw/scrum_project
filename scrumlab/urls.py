@@ -15,14 +15,25 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from jedzonko.views import IndexView, Dashobard
-from jedzonko.views import (IndexView, main_page)
+from jedzonko.views import (
+    IndexView, main_page, Dashobard, recipe_list, plan_list, recipe_add, recipe_details,
+    recipe_modify, plan_details, plan_add, add_recipe_to_plan,
+    )
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('index/', IndexView.as_view()),
     path('main/',Dashobard.as_view()),
-    path('', main_page)
+    path('', main_page),
+
+    path('recipe/<int:recipe_id>/', recipe_details),
+    path('recipe/list/', recipe_list),
+    path('recipe/add/', recipe_add),
+    path('recipe/modify/<int:id>', recipe_modify),
+    path('plan/<int:plan_id>/', plan_details),
+    path('plan/list/', plan_list),
+    path('plan/add/', plan_add),
+    path('plan/add-recipe/', add_recipe_to_plan),
 
 ]
