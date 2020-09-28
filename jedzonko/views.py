@@ -20,8 +20,40 @@ class Dashobard(View):
     def get(self, request):
         return render(request, 'dashboard.html')
 
+
 def main_page(request):
     recipes = [recipe for recipe in Recipe.objects.all()]
     shuffle(recipes)
     return render(request, "index.html", {'recipes': recipes[:3], 'active_carousel_recipe_name': recipes[0].name})
 
+
+def recipe_details(request, recipe_id):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
+
+def recipe_list(request):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
+
+def plan_list(request):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
+
+def recipe_add(request):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
+
+def recipe_modify(request, recipe_id):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
+
+def plan_details(request, plan_id):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
+
+def plan_add(request):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
+
+def add_recipe_to_plan(request):
+    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
