@@ -17,6 +17,19 @@ class Dashobard(View):
     def get(self, request):
         return render(request, 'dashboard.html')
 
+
 def main_page(request):
     return render(request, "index.html")
+
+
+def recipe_list(request):
+    return HttpResponse("")
+
+
+def plan_list(request):
+    return HttpResponse("")
+
+
+def recipe_add(request):
+    return HttpResponse("")
 
