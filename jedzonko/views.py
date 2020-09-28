@@ -18,7 +18,10 @@ class IndexView(View):
 class Dashobard(View):
 
     def get(self, request):
-        return render(request, 'dashboard.html')
+        context = {
+            'recipe_amount': Recipe.recipe_amount(),
+            }
+        return render(request, 'dashboard.html', context)
 
 
 def main_page(request):

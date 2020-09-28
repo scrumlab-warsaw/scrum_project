@@ -11,3 +11,7 @@ class Recipe(models.Model):
     updated = models.DateTimeField(auto_now=True)
     preparation_time = models.IntegerField()
     votes = models.IntegerField(default=0)
+
+    @staticmethod
+    def recipe_amount():
+        return Recipe.objects.all().count()
