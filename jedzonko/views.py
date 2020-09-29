@@ -63,3 +63,4 @@ def plan_add(request):
 
 def add_recipe_to_plan(request):
     return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
