@@ -24,5 +24,5 @@ class Plan(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
-    def schedule_amount():
+    def plan_amount():
         return Plan.objects.all().count()
