@@ -46,7 +46,21 @@ def plan_list(request):
 
 
 def recipe_add(request):
-    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+    if request.method == 'GET':
+        return render(request, 'app-add-recipe.html')
+    if request.method == 'POST':
+        name = request.POST.get('recipe_name')
+        description = request.POST.get('description')
+        preparation_time = request.POST.get('preparation_time')
+        preparation_description = request.POST.get('preparation_description')
+        ingredients = request.POST.get('ingredients')
+        print(name)
+        print(description)
+        print(preparation_time)
+        print(preparation_description)
+        print(ingredients)
+        return render(request, 'app-add-recipe.html')
+
 
 
 def recipe_modify(request, recipe_id):
