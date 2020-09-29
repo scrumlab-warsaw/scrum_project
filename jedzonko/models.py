@@ -17,7 +17,8 @@ class Recipe(models.Model):
     def recipe_amount():
         return Recipe.objects.all().count()
 
-
+    def __str__(self):
+        return f'{self.name[:50]}'
 
 
 class Plan(models.Model):
@@ -30,6 +31,9 @@ class Plan(models.Model):
     def plan_amount():
         return Plan.objects.all().count()
 
+    def __str__(self):
+        return f'{self.name[:30]}'
+
 
 class RecipePlan(models.Model):
     meal_name = models.CharField(max_length=255)
@@ -40,6 +44,9 @@ class RecipePlan(models.Model):
 
     class Meta:
         unique_together = (('meal_name', 'day_name', 'plan'), ('order', 'day_name', 'plan'))
+
+    def __str__(self):
+        return f'{self.plan} - {self.day_name}: {self.meal_name} - {self.recipe}'
 
 
 class DayName(models.Model):
