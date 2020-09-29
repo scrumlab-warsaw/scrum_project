@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
 
-from jedzonko.models import Recipe
+from jedzonko.models import Recipe, Plan
 
 
 class IndexView(View):
@@ -19,9 +19,12 @@ class Dashobard(View):
 
     def get(self, request):
         context = {
-            'recipe_amount': Recipe.recipe_amount(),
+            'recipe_amount': Recipe.recipe_amount(), 'plan_amount': Plan.plan_amount()
             }
         return render(request, 'dashboard.html', context)
+
+
+    
 
 
 def main_page(request):
