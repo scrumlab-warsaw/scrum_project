@@ -2,7 +2,7 @@ from datetime import datetime
 from random import shuffle
 
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 
 from jedzonko.models import Recipe, Plan
@@ -53,7 +53,7 @@ def recipe_add(request):
         ingredients = request.POST.get('ingredients')
         if (name == '' or description == '' or preparation_time == '' or
                 preparation_description == '' or ingredients == ''):
-            context = {'wrong_input': 'Uzupełnij wszystkie pola.',
+            context = {'wrong_input': 'Wypełnij poprawnie wszystkie pola.',
                        'recipe_name': name,
                        'description': description,
                        'preparation_time': preparation_time,
@@ -65,7 +65,7 @@ def recipe_add(request):
         Recipe.objects.create(name=name, ingredients=ingredients, description=description,
                               preparation_description=preparation_description,
                               preparation_time=preparation_time)
-        return render(request, 'app-add-recipe.html')
+        return redirect('recipe_list')
 
 
 def recipe_modify(request, recipe_id):
@@ -82,3 +82,4 @@ def plan_add(request):
 
 def add_recipe_to_plan(request):
     return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+
