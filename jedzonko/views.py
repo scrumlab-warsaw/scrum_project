@@ -35,7 +35,7 @@ def recipe_details(request, recipe_id):
 
 
 def recipe_list(request):
-    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+    return render(request, 'app-recipes.html')
 
 
 def plan_list(request):
