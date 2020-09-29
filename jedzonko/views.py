@@ -24,9 +24,6 @@ class Dashobard(View):
         return render(request, 'dashboard.html', context)
 
 
-    
-
-
 def main_page(request):
     recipes = [recipe for recipe in Recipe.objects.all()]
     shuffle(recipes)
@@ -46,7 +43,29 @@ def plan_list(request):
 
 
 def recipe_add(request):
-    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+    if request.method == 'GET':
+        return render(request, 'app-add-recipe.html')
+    if request.method == 'POST':
+        name = request.POST.get('recipe_name')
+        description = request.POST.get('description')
+        preparation_time = request.POST.get('preparation_time')
+        preparation_description = request.POST.get('preparation_description')
+        ingredients = request.POST.get('ingredients')
+        if (name == '' or description == '' or preparation_time == '' or
+                preparation_description == '' or ingredients == ''):
+            context = {'wrong_input': 'Uzupełnij wszystkie pola.',
+                       'recipe_name': name,
+                       'description': description,
+                       'preparation_time': preparation_time,
+                       'preparation_description': preparation_description,
+                       'ingredients': ingredients
+                       }
+            return render(request, 'app-add-recipe.html', context)
+
+        Recipe.objects.create(name=name, ingredients=ingredients, description=description,
+                              preparation_description=preparation_description,
+                              preparation_time=preparation_time)
+        return render(request, 'app-add-recipe.html')
 
 
 def recipe_modify(request, recipe_id):
