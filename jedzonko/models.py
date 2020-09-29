@@ -9,6 +9,7 @@ class Recipe(models.Model):
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    preparation_description = models.TextField(default='')
     preparation_time = models.IntegerField()
     votes = models.IntegerField(default=0)
 
