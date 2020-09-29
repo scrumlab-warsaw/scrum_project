@@ -15,14 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from jedzonko.views import IndexView, Dashobard
-from jedzonko.views import (IndexView, main_page)
+
+from jedzonko.views import (IndexView, main_page, Dashobard)
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('index/', IndexView.as_view()),
     path('main/',Dashobard.as_view()),
-    path('', main_page)
+    path('', main_page),
+
 
 ]
