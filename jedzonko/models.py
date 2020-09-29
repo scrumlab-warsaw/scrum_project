@@ -30,17 +30,6 @@ class Plan(models.Model):
 
 
 class RecipePlan(models.Model):
-    meal_name = models.CharField(max_length=255)
-    order = models.IntegerField()
-    day_name = models.ForeignKey('DayName', on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('meal_name', 'order', 'day_name')
-
-
-class DayName(models.Model):
     DAY_NAMES = (
         (1, 'Poniedziałek'),
         (2, 'Wtorek'),
@@ -51,5 +40,11 @@ class DayName(models.Model):
         (7, 'Niedziela')
     )
 
-    day_name = models.IntegerField(choices=DAY_NAMES)
+    meal_name = models.CharField(max_length=255)
     order = models.IntegerField()
+    day_name = models.IntegerField(choices=DAY_NAMES)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (('meal_name', 'day_name'), ('order', 'day_name'))
