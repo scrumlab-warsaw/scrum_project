@@ -18,11 +18,11 @@ class Recipe(models.Model):
         return Recipe.objects.all().count()
 
 
-class Schedule(models.Model):
+class Plan(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
     def schedule_amount():
-        return Schedule.objects.all().count()
+        return Plan.objects.all().count()
