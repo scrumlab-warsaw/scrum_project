@@ -48,3 +48,11 @@ class RecipePlan(models.Model):
 
     class Meta:
         unique_together = (('meal_name', 'day_name'), ('order', 'day_name'))
+
+
+class DayName(models.Model):
+    day_name = models.CharField(max_length=16)
+    order = models.IntegerField(unique=True)
+
+    def __str__(self):
+        return self.day_name
