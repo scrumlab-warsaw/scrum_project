@@ -17,6 +17,9 @@ class Recipe(models.Model):
     def recipe_amount():
         return Recipe.objects.all().count()
 
+    def __str__(self):
+        return f'{self.name[:50]}'
+
 
 class Plan(models.Model):
     name = models.CharField(max_length=255)
@@ -28,23 +31,27 @@ class Plan(models.Model):
     def plan_amount():
         return Plan.objects.all().count()
 
+    def __str__(self):
+        return f'{self.name[:30]}'
+
 
 class RecipePlan(models.Model):
-    DAY_NAMES = (
-        (1, 'Poniedziałek'),
-        (2, 'Wtorek'),
-        (3, 'Środa'),
-        (4, 'Czwartek'),
-        (5, 'Piątek'),
-        (6, 'Sobota'),
-        (7, 'Niedziela')
-    )
-
     meal_name = models.CharField(max_length=255)
     order = models.IntegerField()
-    day_name = models.IntegerField(choices=DAY_NAMES)
+    day_name = models.ForeignKey('DayName', on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = (('meal_name', 'day_name'), ('order', 'day_name'))
+        unique_together = (('meal_name', 'day_name', 'plan'), ('order', 'day_name', 'plan'))
+
+    def __str__(self):
+        return f'{self.plan} - {self.day_name}: {self.meal_name} - {self.recipe}'
+
+
+class DayName(models.Model):
+    day_name = models.CharField(max_length=16)
+    order = models.IntegerField(unique=True)
+
+    def __str__(self):
+        return self.day_name
