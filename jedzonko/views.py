@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 
-from jedzonko.models import Recipe, Plan
+from jedzonko.models import Recipe, Plan, DayName, RecipePlan
 
 
 class IndexView(View):
@@ -116,4 +116,37 @@ def plan_add(request):
 
 
 def add_recipe_to_plan(request):
-    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+    plans = Plan.objects.all()
+    recipes = Recipe.objects.all()
+    days = DayName.objects.all()
+
+    if request.method == 'GET':
+        context = {'plans': plans,
+                   'recipes': recipes,
+                   'days': days}
+        return render(request, 'app-schedules-meal-recipe.html', context)
+
+    else:
+        plan = request.POST.get('plan')
+        meal_name = request.POST.get('meal_name')
+        order = request.POST.get('order')
+        recipe = request.POST.get('recipe')
+        day = request.POST.get('day')
+
+        if meal_name == "" or order == "":
+            context = {'plans': plans,
+                       'recipes': recipes,
+                       'days': days,
+                       'wrong_input': 'Wypełnij poprawnie wszystkie pola.',
+                       'meal_name': meal_name,
+                       'order': order
+                       }
+
+        # loaded_plan = Plan.objects.get(id=plan.id)
+        # loaded_recipe = Recipe.objects.get(id=recipe.id)
+        # loaded_day = DayName.objects.get(id=day.id)
+        # plan = Plan.objects.create(name=name, description=description)
+        # RecipePlan.objects.create(meal_name=meal_name, order=order, day_name=loaded_day,
+        #                           recipe=loaded_recipe, plan=loaded_plan)
+        return render(request, 'app-schedules-meal-recipe.html', context)
+
