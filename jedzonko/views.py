@@ -39,7 +39,7 @@ def recipe_list(request):
 
 
 def plan_list(request):
-    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+    return render(request, 'app-schedules.html')
 
 
 def recipe_add(request):
@@ -65,7 +65,7 @@ def recipe_add(request):
         Recipe.objects.create(name=name, ingredients=ingredients, description=description,
                               preparation_description=preparation_description,
                               preparation_time=preparation_time)
-        return redirect('recipe_list')
+
 
 
 def recipe_modify(request, recipe_id):
@@ -73,11 +73,25 @@ def recipe_modify(request, recipe_id):
 
 
 def plan_details(request, plan_id):
-    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+    return HttpResponse("udało się")  # tymczasowo, do późniejszego uzupełnienia
 
 
 def plan_add(request):
-    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+    if request.method == 'GET':
+        return render(request, 'app-add-schedules.html')
+    else:
+        name = request.POST.get('plan_name')
+        description = request.POST.get('plan_description')
+        if name == "" or description == "":
+            context = {
+                'wrong_input': 'Wypełnij poprawnie wszystkie pola.',
+                'plan_name': name,
+                'plan_description': description,
+            }
+            return render(request, 'app-add-schedules.html', context)
+
+        plan = Plan.objects.create(name=name, description=description)
+        return redirect(f'/plan/{plan.id}')
 
 
 def add_recipe_to_plan(request):
