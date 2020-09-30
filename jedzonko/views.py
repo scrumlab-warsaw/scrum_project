@@ -18,9 +18,20 @@ class IndexView(View):
 class Dashobard(View):
 
     def get(self, request):
+        latest_plan = Plan.objects.all().order_by('-created')[0]
+        plan_recipes = latest_plan.recipeplan_set.all().order_by('-day_name__order')
+        days = []
+        for i in range(1, 8):
+            recipes_for_day = plan_recipes.filter(day_name__order=i).order_by('order')
+            if len(recipes_for_day) > 0:
+                days.append((recipes_for_day[0].day_name, recipes_for_day))
+
         context = {
-            'recipe_amount': Recipe.recipe_amount(), 'plan_amount': Plan.plan_amount()
-            }
+            'recipe_amount': Recipe.recipe_amount(),
+            'plan_amount': Plan.plan_amount(),
+            'days': days,
+            'latest_plan': latest_plan,
+        }
         return render(request, 'dashboard.html', context)
 
 
@@ -96,4 +107,3 @@ def plan_add(request):
 
 def add_recipe_to_plan(request):
     return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
-
