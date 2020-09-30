@@ -27,7 +27,7 @@ urlpatterns = [
     path('main/',Dashobard.as_view()),
     path('', main_page),
 
-    path('recipe/<int:recipe_id>/', recipe_details),
+    path('recipe/<int:recipe_id>/', recipe_details, name="recipe_details"),
     path('recipe/list/', recipe_list, name="recipe_list"),
     path('recipe/add/', recipe_add),
     path('recipe/modify/<int:id>', recipe_modify),
