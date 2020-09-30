@@ -16,30 +16,27 @@
         <table class="table borderless">
             <tbody>
             <tr class="d-flex">
-                <th scope="row" class="col-2">Nazwa Przepisu</th>
+                <th scope="row" class="col-2" style="margin-right: 20px">Nazwa Przepisu</th>
                 <td class="col-7">
-                    Zapiekanka z ziemniakami i brukselką
+                    {{ recipe.name }}
                 </td>
             </tr>
             <tr class="d-flex">
-                <th scope="row" class="col-2">Opis przepisu</th>
-                <td class="col-7">Mamusina najlepsza zapiekanka pod słońcem.
-                    Można ją podać jako główne danie albo jako kolację. W
-                    zapiekance możesz użyć również kiełbasy paprykowej sprawi
-                    ona, że zapiekanka będzie ostrzejsza w smaku. Zgodnie z
-                    zalecanimi Makłowicza, podawać z dobrze dobranym winkiem ;)
+                <th scope="row" class="col-2" style="margin-right: 20px">Opis przepisu</th>
+                <td class="col-7">
+                    {{ recipe.description }}
                 </td>
             </tr>
             <tr class="d-flex">
-                <th scope="row" class="col-2">Przygotowanie (minuty)</th>
+                <th scope="row" class="col-2" style="margin-right: 20px">Przygotowanie (minuty)</th>
                 <td class="col-7">
-                    45
+                    {{ recipe.preparation_time }}
                 </td>
             </tr>
              <tr class="d-flex">
-                <th scope="row" class="col-2">Liczba polubień</th>
+                <th scope="row" class="col-2" style="margin-right: 20px">Liczba polubień</th>
                 <td class="col-7">
-                    99
+                    {{ recipe.votes }}
                 </td>
             </tr>
             </tbody>
@@ -54,21 +51,13 @@
         </div>
         <div class="row d-flex">
             <div class="col-5 p-4">
-                <p>Po tym czasie ziemniaki zalej śmietaną wymieszaną z Knorr
-                    Naturalnie smaczne, dodaj liście brukselki i dokładnie
-                    wymieszaj.</p>
+                <p>{{ recipe.preparation_description }}</p>
             </div>
             <div class="col-2"></div>
             <ul class="col-5 p-4 list-unstyled">
-                <li>brukselka 300g</li>
-                <li>ziemniaki 500g</li>
-                <li>Fix Naturalnie makaronowa z szynką Knorr 1 szt.</li>
-                <li>średnia cebula 1szt.</li>
-                <li>ząbek czosnku 1szt.</li>
-                <li>kiełbasa np. śląska 500g</li>
-                <li>śmietana 18% 200 ml</li>
-                <li>Rama Smaż jak szef kuchni, wariant klasyczny 4 łyżki</li>
-                <li>gałązka tymianku 1 szt.</li>
+                {% for ingredient in recipe.ingredients_as_list %}
+                    <li>{{ ingredient }}</li>
+                {% endfor %}
             </ul>
         </div>
 

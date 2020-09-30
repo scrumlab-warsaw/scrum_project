@@ -17,6 +17,15 @@ class Recipe(models.Model):
     def recipe_amount():
         return Recipe.objects.all().count()
 
+
+    def ingredients_as_list(self):
+        if "," in self.ingredients:
+            lst = self.ingredients.split(",")
+        else:
+            lst = self.ingredients.split()
+        return lst
+
+
     def __str__(self):
         return f'{self.name[:50]}'
 
