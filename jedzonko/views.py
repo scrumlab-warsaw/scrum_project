@@ -150,7 +150,7 @@ class AddMealToPlan(View):
                        }
             return render(request, 'app-schedules-meal-recipe.html', context)
 
-        if AddMealToPlan.saving_validation(loaded_plan, meal_name, loaded_day, order):
+        if AddMealToPlan.saving_failure(loaded_plan, meal_name, loaded_day, order):
             context = {'plans': AddMealToPlan.PLANS,
                        'loaded_plan': loaded_plan,
                        'recipes': AddMealToPlan.RECIPES,
@@ -168,7 +168,7 @@ class AddMealToPlan(View):
         return redirect(f'/plan/{loaded_plan.id}')
 
     @staticmethod
-    def saving_validation(plan, meal, day, order):
+    def saving_failure(plan, meal, day, order):
         validate_1 = RecipePlan.objects.filter(plan=plan, meal_name=meal, day_name=day).count()
         validate_2 = RecipePlan.objects.filter(plan=plan, order=order, day_name=day).count()
         return validate_1 + validate_2
