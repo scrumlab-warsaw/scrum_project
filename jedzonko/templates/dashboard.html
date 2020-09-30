@@ -38,7 +38,7 @@
                     <h2 class="dashboard-content-title">
                         <span>Ostatnio dodany plan:</span> {{ latest_plan }}
                     </h2>
-                    {% for day_name, day in day_plans %}
+                    {% for day_name, day in days %}
                         <table class="table">
                             <thead>
                                 <tr class="d-flex">
@@ -48,11 +48,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for recipe in day %}
+                                {% for recipe_plan in day %}
                                     <tr class="d-flex">
-                                        <td class="col-2">{{ recipe.meal_name }}</td>
-                                        <td class="col-8">{{ recipe.recipe }}</td>
-                                        <td class="col-2"><a href="{% url 'recipe_details' recipe.recipe.id %}"><button type="button" class="btn btn-primary rounded-0">Szczegóły</button></a></td>
+                                        <td class="col-2">{{ recipe_plan.meal_name }}</td>
+                                        <td class="col-8">{{ recipe_plan.recipe }}</td>
+                                        <td class="col-2"><a href="{% url 'recipe_details' recipe_plan.recipe.id %}"><button type="button" class="btn btn-primary rounded-0">Szczegóły</button></a></td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
