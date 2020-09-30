@@ -18,8 +18,17 @@ class IndexView(View):
 class Dashobard(View):
 
     def get(self, request):
+        latest_plan = Plan.objects.all().order_by('-created')[0]
+        recipe_plans = latest_plan.recipeplan_set.all().order_by('-day_name__order')
+        day_plans = []
+        for i in range(7):
+            plans_for_day = recipe_plans.filter(day_name__order=i).order_by('order')
+            if len(plans_for_day) > 0:
+                day_plans.append((plans_for_day[0].day_name.day_name, plans_for_day))
+
+        print(day_plans)
         context = {
-            'recipe_amount': Recipe.recipe_amount(), 'plan_amount': Plan.plan_amount()
+            'recipe_amount': Recipe.recipe_amount(), 'plan_amount': Plan.plan_amount(), 'day_plans': day_plans, 'latest_plan': latest_plan
             }
         return render(request, 'dashboard.html', context)
 
