@@ -1,5 +1,6 @@
 from datetime import datetime
 from random import shuffle
+from math import ceil
 
 from django.core.paginator import Paginator
 from django.http import HttpResponse
@@ -57,7 +58,7 @@ def plan_list(request):
     paginator = Paginator(plans, PLANS_PER_PAGE)
     page_number = int(request.GET.get('page', 1))
     page_obj = paginator.get_page(page_number)
-    page_numbers = [i for i in range(page_number - 2, page_number + 3) if 0 < i <= len(plans) / PLANS_PER_PAGE]
+    page_numbers = [i for i in range(page_number - 2, page_number + 3) if 0 < i <= ceil(len(plans) / PLANS_PER_PAGE)]
     return render(request, 'app-schedules.html', {'page_obj': page_obj, 'page_numbers': page_numbers})
 
 
