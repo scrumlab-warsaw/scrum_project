@@ -33,11 +33,20 @@
                     {{ recipe.preparation_time }}
                 </td>
             </tr>
-             <tr class="d-flex">
+            <tr class="d-flex">
                 <th scope="row" class="col-2" style="margin-right: 20px">Liczba polubień</th>
-                <td class="col-7">
-                    {{ recipe.votes }}
+                <td class="col-1">
+                {{ recipe.votes }}
                 </td>
+                <form method="POST">
+                    {% csrf_token %}
+                    <td>
+                        <input type="submit" name="like" value="Lubię przepis" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">
+                    </td>
+                    <td>
+                        <input type="submit" name="dislike" value="Nie lubię przepisu" class="btn btn-danger rounded-0 pt-0 pb-0 pr-4 pl-4">
+                    </td>
+                </form>
             </tr>
             </tbody>
         </table>
