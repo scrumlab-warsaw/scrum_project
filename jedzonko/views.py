@@ -115,38 +115,60 @@ def plan_add(request):
         return redirect(f'/plan/{plan.id}')
 
 
-def add_recipe_to_plan(request):
-    plans = Plan.objects.all()
-    recipes = Recipe.objects.all()
-    days = DayName.objects.all()
+class AddMealToPlan(View):
+    PLANS = Plan.objects.all()
+    RECIPES = Recipe.objects.all()
+    DAYS = DayName.objects.all()
 
-    if request.method == 'GET':
-        context = {'plans': plans,
-                   'recipes': recipes,
-                   'days': days}
+    def get(self, request):
+        context = {'plans': AddMealToPlan.PLANS,
+                   'recipes': AddMealToPlan.RECIPES,
+                   'days': AddMealToPlan.DAYS}
         return render(request, 'app-schedules-meal-recipe.html', context)
 
-    else:
+    def post(self, request):
         plan = request.POST.get('plan')
         meal_name = request.POST.get('meal_name')
         order = request.POST.get('order')
         recipe = request.POST.get('recipe')
         day = request.POST.get('day')
 
+        loaded_plan = Plan.objects.get(name=plan)
+        loaded_recipe = Recipe.objects.get(name=recipe)
+        loaded_day = DayName.objects.get(day_name=day)
+
         if meal_name == "" or order == "":
-            context = {'plans': plans,
-                       'recipes': recipes,
-                       'days': days,
-                       'wrong_input': 'Wypełnij poprawnie wszystkie pola.',
+            context = {'plans': AddMealToPlan.PLANS,
+                       'loaded_plan': loaded_plan,
+                       'recipes': AddMealToPlan.RECIPES,
+                       'loaded_recipe': loaded_recipe,
+                       'days': AddMealToPlan.DAYS,
+                       'loaded_day': loaded_day,
+                       'error_message': 'Wypełnij poprawnie wszystkie pola.',
                        'meal_name': meal_name,
                        'order': order
                        }
+            return render(request, 'app-schedules-meal-recipe.html', context)
 
-        # loaded_plan = Plan.objects.get(id=plan.id)
-        # loaded_recipe = Recipe.objects.get(id=recipe.id)
-        # loaded_day = DayName.objects.get(id=day.id)
-        # plan = Plan.objects.create(name=name, description=description)
-        # RecipePlan.objects.create(meal_name=meal_name, order=order, day_name=loaded_day,
-        #                           recipe=loaded_recipe, plan=loaded_plan)
-        return render(request, 'app-schedules-meal-recipe.html', context)
+        if AddMealToPlan.saving_validation(loaded_plan, meal_name, loaded_day, order):
+            context = {'plans': AddMealToPlan.PLANS,
+                       'loaded_plan': loaded_plan,
+                       'recipes': AddMealToPlan.RECIPES,
+                       'loaded_recipe': loaded_recipe,
+                       'days': AddMealToPlan.DAYS,
+                       'loaded_day': loaded_day,
+                       'error_message': 'Ten posiłek już istnieje.',
+                       'meal_name': meal_name,
+                       'order': order
+                       }
+            return render(request, 'app-schedules-meal-recipe.html', context)
 
+        RecipePlan.objects.create(meal_name=meal_name, order=order, day_name=loaded_day,
+                                  recipe=loaded_recipe, plan=loaded_plan)
+        return redirect(f'/plan/{loaded_plan.id}')
+
+    @staticmethod
+    def saving_validation(plan, meal, day, order):
+        validate_1 = RecipePlan.objects.filter(plan=plan, meal_name=meal, day_name=day).count()
+        validate_2 = RecipePlan.objects.filter(plan=plan, order=order, day_name=day).count()
+        return validate_1 + validate_2

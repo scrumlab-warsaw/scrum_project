@@ -6,7 +6,7 @@
         <div class="col noPadding">
             <h3 class="color-header text-uppercase">DODAJ PRZEPIS DO PLANU</h3>
         </div>
-        <div style="color: red"><b>{{ wrong_input }}</b></div>
+        <div style="color: red; margin-right: 20px"><b>{{ error_message }}</b></div>
         <form method="POST">
             {% csrf_token %}
         <div class="col d-flex justify-content-end mb-2 noPadding">
@@ -23,7 +23,8 @@
                 <div class="col-sm-3">
                     <select name="plan" class="form-control" id="choosePlan">
                         {% for plan in plans %}
-                            <option >{{ plan }}</option>
+                            <option {% if plan == loaded_plan %} selected {% endif %}>
+                                {{ plan }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -53,7 +54,8 @@
                 <div class="col-sm-4">
                     <select name="recipe" class="form-control" id="recipie">
                         {% for recipe in recipes %}
-                            <option>{{ recipe }}</option>
+                            <option {% if recipe == loaded_recipe %} selected {% endif %}>
+                                {{ recipe }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -65,7 +67,8 @@
                 <div class="col-sm-2">
                     <select name="day" class="form-control" id="day">
                         {% for day in days %}
-                            <option>{{ day }}</option>
+                            <option {% if day == loaded_day %} selected {% endif %}>
+                                {{ day }}</option>
                         {% endfor %}
                     </select>
                 </div>
