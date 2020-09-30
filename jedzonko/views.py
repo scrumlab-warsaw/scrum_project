@@ -1,6 +1,7 @@
 from datetime import datetime
 from random import shuffle
 
+from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
@@ -50,7 +51,14 @@ def recipe_list(request):
 
 
 def plan_list(request):
-    return render(request, 'app-schedules.html')
+    PLANS_PER_PAGE = 50
+    plans = [plan for plan in Plan.objects.all().order_by('name')]
+    plans = [(i, plan) for i, plan in enumerate(plans, 1)]
+    paginator = Paginator(plans, PLANS_PER_PAGE)
+    page_number = int(request.GET.get('page', 1))
+    page_obj = paginator.get_page(page_number)
+    page_numbers = [i for i in range(page_number - 2, page_number + 3) if 0 < i <= len(plans) / PLANS_PER_PAGE]
+    return render(request, 'app-schedules.html', {'page_obj': page_obj, 'page_numbers': page_numbers})
 
 
 def recipe_add(request):
@@ -76,7 +84,6 @@ def recipe_add(request):
         Recipe.objects.create(name=name, ingredients=ingredients, description=description,
                               preparation_description=preparation_description,
                               preparation_time=preparation_time)
-
 
 
 def recipe_modify(request, recipe_id):
