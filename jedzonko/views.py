@@ -42,7 +42,9 @@ def main_page(request):
 
 
 def recipe_details(request, recipe_id):
-    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+    recipe = Recipe.objects.get(id=recipe_id)
+    context = {'recipe': recipe, }
+    return render(request, 'app-recipe-details.html', context)
 
 
 def recipe_list(request):
