@@ -17,14 +17,12 @@ class Recipe(models.Model):
     def recipe_amount():
         return Recipe.objects.all().count()
 
-
     def ingredients_as_list(self):
         if "," in self.ingredients:
             lst = self.ingredients.split(",")
         else:
             lst = self.ingredients.split()
         return lst
-
 
     def __str__(self):
         return f'{self.name[:50]}'
@@ -64,3 +62,12 @@ class DayName(models.Model):
 
     def __str__(self):
         return self.day_name
+
+
+class Page(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    slug = models.SlugField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.title
