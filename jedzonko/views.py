@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 
-from jedzonko.models import Recipe, Plan
+from jedzonko.models import Recipe, Plan, DayName, RecipePlan
 
 
 class IndexView(View):
@@ -45,7 +45,19 @@ def main_page(request):
 
 def recipe_details(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id)
-    context = {'recipe': recipe, }
+
+    if request.method == 'POST':
+        like = request.POST.get('like')
+        dislike = request.POST.get('dislike')
+
+        if like:
+            recipe.votes += 1
+        elif dislike:
+            recipe.votes -= 1
+
+        recipe.save()
+
+    context = {'recipe': recipe}
     return render(request, 'app-recipe-details.html', context)
 
 
@@ -115,5 +127,68 @@ def plan_add(request):
         return redirect(f'/plan/{plan.id}')
 
 
-def add_recipe_to_plan(request):
-    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+class AddMealToPlan(View):
+    PLANS = Plan.objects.all()
+    RECIPES = Recipe.objects.all()
+    DAYS = DayName.objects.all()
+
+    def get(self, request):
+        context = {'plans': AddMealToPlan.PLANS,
+                   'recipes': AddMealToPlan.RECIPES,
+                   'days': AddMealToPlan.DAYS}
+        return render(request, 'app-schedules-meal-recipe.html', context)
+
+    def post(self, request):
+        plan = request.POST.get('plan')
+        meal_name = request.POST.get('meal_name')
+        order = request.POST.get('order')
+        recipe = request.POST.get('recipe')
+        day = request.POST.get('day')
+
+        loaded_plan = Plan.objects.get(name=plan)
+        loaded_recipe = Recipe.objects.get(name=recipe)
+        loaded_day = DayName.objects.get(day_name=day)
+
+        if meal_name == "" or order == "":
+            context = {'plans': AddMealToPlan.PLANS,
+                       'loaded_plan': loaded_plan,
+                       'recipes': AddMealToPlan.RECIPES,
+                       'loaded_recipe': loaded_recipe,
+                       'days': AddMealToPlan.DAYS,
+                       'loaded_day': loaded_day,
+                       'error_message': 'Wypełnij poprawnie wszystkie pola.',
+                       'meal_name': meal_name,
+                       'order': order
+                       }
+            return render(request, 'app-schedules-meal-recipe.html', context)
+
+        if AddMealToPlan.check_if_recipeplan(loaded_plan, meal_name, loaded_day, order):
+            context = {'plans': AddMealToPlan.PLANS,
+                       'loaded_plan': loaded_plan,
+                       'recipes': AddMealToPlan.RECIPES,
+                       'loaded_recipe': loaded_recipe,
+                       'days': AddMealToPlan.DAYS,
+                       'loaded_day': loaded_day,
+                       'error_message': 'Ten posiłek już istnieje.',
+                       'meal_name': meal_name,
+                       'order': order
+                       }
+            return render(request, 'app-schedules-meal-recipe.html', context)
+
+        RecipePlan.objects.create(meal_name=meal_name, order=order, day_name=loaded_day,
+                                  recipe=loaded_recipe, plan=loaded_plan)
+        return redirect(f'/plan/{loaded_plan.id}')
+
+    @staticmethod
+    def check_if_recipeplan(plan, meal, day, order):
+        """
+        Check if RecipePlan object already exists in database.
+        :param plan: object from class Plan
+        :param meal: attribute from RecipePlan object
+        :param day: object from class DayName
+        :param order: attribute from RecipePlan object
+        :return: boolean: True - exists, False - doesn't exist.
+        """
+        validate_1 = RecipePlan.objects.filter(plan=plan, meal_name=meal, day_name=day).count()
+        validate_2 = RecipePlan.objects.filter(plan=plan, order=order, day_name=day).count()
+        return (validate_1 + validate_2) != 0
