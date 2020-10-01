@@ -101,14 +101,47 @@ def recipe_add(request):
                               preparation_time=preparation_time)
 
 
-class RecipeModify(View):
+def recipe_modify(request, recipe_id):
+    try:
+        recipe = Recipe.objects.get(id=recipe_id)
+    except Recipe.DoesNotExist:
+        raise Http404('Recipe does not exist!')
 
-    def get(self, request, recipe_id):
-        recipe = Recipe.objects.filter(id=recipe_id)
-        if not recipe.count():
-            raise Http404("Recipe does not exist!")
+    if request.method == 'GET':
+        context = {'recipe': recipe}
+        return render(request, 'app-edit-recipe.html', context)
 
-        return render(request, 'app-edit-recipe.html')
+    else:
+        loaded_name = request.POST.get('name')
+        loaded_description = request.POST.get('description')
+        loaded_prep_time = request.POST.get('preparation_time')
+        loaded_prep_desc = request.POST.get('preparation_description')
+        loaded_ingredients = request.POST.get('ingredients')
+
+        error_recipe = {
+            'name': loaded_name,
+            'description': loaded_description,
+            'preparation_time': loaded_prep_time,
+            'preparation_description': loaded_prep_desc,
+            'ingredients': loaded_ingredients
+        }
+
+        if (loaded_name == "" or loaded_description == "" or loaded_prep_time == "" or
+                loaded_prep_desc == "" or loaded_ingredients == ""):
+            context = {'recipe': error_recipe,
+                       'error_message': "Wypełnij poprawnie wszystkie pola."}
+            return render(request, 'app-edit-recipe.html', context)
+
+        if (recipe.name == loaded_name and recipe.description == loaded_description and
+                recipe.preparation_time == int(loaded_prep_time) and recipe.preparation_description == loaded_prep_desc
+                and recipe.ingredients == loaded_ingredients):
+            context = {'recipe': error_recipe,
+                       'error_message': "Ten przepis już istnieje!"}
+            return render(request, 'app-edit-recipe.html', context)
+
+        Recipe.objects.create(name=loaded_name, ingredients=loaded_ingredients, description=loaded_description,
+                              preparation_description=loaded_prep_desc, preparation_time=loaded_prep_time)
+        return redirect('recipe_list')
 
 
 def plan_details(request, plan_id):
