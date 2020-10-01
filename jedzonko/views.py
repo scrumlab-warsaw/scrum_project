@@ -45,7 +45,19 @@ def main_page(request):
 
 def recipe_details(request, recipe_id):
     recipe = Recipe.objects.get(id=recipe_id)
-    context = {'recipe': recipe, }
+
+    if request.method == 'POST':
+        like = request.POST.get('like')
+        dislike = request.POST.get('dislike')
+
+        if like:
+            recipe.votes += 1
+        elif dislike:
+            recipe.votes -= 1
+
+        recipe.save()
+
+    context = {'recipe': recipe}
     return render(request, 'app-recipe-details.html', context)
 
 
