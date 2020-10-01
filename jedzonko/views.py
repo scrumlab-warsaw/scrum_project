@@ -3,7 +3,7 @@ from random import shuffle
 from math import ceil
 
 from django.core.paginator import Paginator
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from django.views import View
 
@@ -101,8 +101,14 @@ def recipe_add(request):
                               preparation_time=preparation_time)
 
 
-def recipe_modify(request, recipe_id):
-    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+class RecipeModify(View):
+
+    def get(self, request, recipe_id):
+        recipe = Recipe.objects.filter(id=recipe_id)
+        if not recipe.count():
+            raise Http404("Recipe does not exist!")
+
+        return render(request, 'app-edit-recipe.html')
 
 
 def plan_details(request, plan_id):
