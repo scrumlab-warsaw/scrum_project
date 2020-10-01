@@ -162,7 +162,7 @@ class AddMealToPlan(View):
                        }
             return render(request, 'app-schedules-meal-recipe.html', context)
 
-        if AddMealToPlan.saving_failure(loaded_plan, meal_name, loaded_day, order):
+        if AddMealToPlan.check_if_recipeplan(loaded_plan, meal_name, loaded_day, order):
             context = {'plans': AddMealToPlan.PLANS,
                        'loaded_plan': loaded_plan,
                        'recipes': AddMealToPlan.RECIPES,
@@ -180,7 +180,15 @@ class AddMealToPlan(View):
         return redirect(f'/plan/{loaded_plan.id}')
 
     @staticmethod
-    def saving_failure(plan, meal, day, order):
+    def check_if_recipeplan(plan, meal, day, order):
+        """
+        Check if RecipePlan object already exists in database.
+        :param plan: object from class Plan
+        :param meal: attribute from RecipePlan object
+        :param day: object from class DayName
+        :param order: attribute from RecipePlan object
+        :return: boolean: True - exists, False - doesn't exist.
+        """
         validate_1 = RecipePlan.objects.filter(plan=plan, meal_name=meal, day_name=day).count()
         validate_2 = RecipePlan.objects.filter(plan=plan, order=order, day_name=day).count()
-        return validate_1 + validate_2
+        return (validate_1 + validate_2) != 0
