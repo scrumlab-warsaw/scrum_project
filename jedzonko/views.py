@@ -43,22 +43,22 @@ def main_page(request):
     return render(request, "index.html", {'recipes': recipes[:3], 'active_carousel_recipe_name': recipes[0].name})
 
 
-def recipe_details(request, recipe_id):
-    recipe = Recipe.objects.get(id=recipe_id)
+class RecipeDetails(View):
+    def get(self, request, recipe_id):
+        recipe = Recipe.objects.get(id=recipe_id)
+        return render(request, 'app-recipe-details.html', {'recipe': recipe})
 
-    if request.method == 'POST':
+    def post(self, request, recipe_id):
+        recipe = Recipe.objects.get(id=recipe_id)
         like = request.POST.get('like')
         dislike = request.POST.get('dislike')
-
         if like:
             recipe.votes += 1
         elif dislike:
             recipe.votes -= 1
 
         recipe.save()
-
-    context = {'recipe': recipe}
-    return render(request, 'app-recipe-details.html', context)
+        return render(request, 'app-recipe-details.html', {'recipe': recipe})
 
 
 def recipe_list(request):
