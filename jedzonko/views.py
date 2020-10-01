@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 
-from jedzonko.models import Recipe, Plan
+from jedzonko.models import Recipe, Plan, RecipePlan
 
 
 class IndexView(View):
@@ -94,7 +94,19 @@ def recipe_modify(request, recipe_id):
 
 
 def plan_details(request, plan_id):
-    return HttpResponse("udało się")  # tymczasowo, do późniejszego uzupełnienia
+    plan = Plan.objects.get(id=plan_id)
+    recipes_plans = plan.recipeplan_set.all()
+    meals_for_day = []
+    for i in range(1,8):
+        recipes_for_day= recipes_plans.filter(day_name__order=i)
+        if len(recipes_for_day) > 0:
+            meals_for_day.append((recipes_for_day[0].day_name, recipes_for_day))
+    context = {
+        'plan': plan,
+        'meals_for_day': meals_for_day
+    }
+    return render(request, 'app-details-schedules.html', context)
+    #return HttpResponse("udało się")  # tymczasowo, do późniejszego uzupełnienia
 
 
 def plan_add(request):
