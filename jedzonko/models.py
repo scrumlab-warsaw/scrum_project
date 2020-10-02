@@ -22,7 +22,7 @@ class Recipe(models.Model):
         counter = Recipe.objects.filter(name=name, ingredients=ingredients, description=description,
                                         preparation_description=preparation_description,
                                         preparation_time=preparation_time).count()
-        return counter
+        return counter > 0
 
     def ingredients_as_list(self):
         if "," in self.ingredients:
