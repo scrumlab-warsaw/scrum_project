@@ -261,3 +261,26 @@ def page(request, slug):
         return render(request, 'page.html', {'page': page})
     else:
         return redirect(f'/#{slug}')
+
+
+class ModifyPlanRecipes(View):
+    def get(self, request, plan_id):
+        plan = Plan.objects.get(pk=plan_id)
+        recipes = Recipe.objects.all()
+        plan_recipes = plan.recipeplan_set.all().order_by('-day_name__order')
+        days = []
+        for i in range(1, 8):
+            recipes_for_day = plan_recipes.filter(day_name__order=i).order_by('order')
+            if len(recipes_for_day) > 0:
+                days.append((recipes_for_day[0].day_name, recipes_for_day))
+
+        context = {
+            'recipe_amount': Recipe.recipe_amount(),
+            'plan_amount': Plan.plan_amount(),
+            'days': days,
+            'plan': plan,
+            'recipes': recipes,
+        }
+
+        return render(request, 'modify_plan_recipes.html', context)
+
