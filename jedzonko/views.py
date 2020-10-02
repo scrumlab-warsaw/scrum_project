@@ -132,9 +132,8 @@ def recipe_modify(request, recipe_id):
                        'error_message': "Wypełnij poprawnie wszystkie pola."}
             return render(request, 'app-edit-recipe.html', context)
 
-        if (recipe.name == loaded_name and recipe.description == loaded_description and
-                recipe.preparation_time == int(loaded_prep_time) and recipe.preparation_description == loaded_prep_desc
-                and recipe.ingredients == loaded_ingredients):
+        if (Recipe.is_in_database(loaded_name, loaded_ingredients, loaded_description,
+                                  loaded_prep_desc, loaded_prep_time)):
             context = {'recipe': error_recipe,
                        'error_message': "Ten przepis już istnieje!"}
             return render(request, 'app-edit-recipe.html', context)
