@@ -7,7 +7,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from django.views import View
 
-from jedzonko.models import Recipe, Plan, DayName, RecipePlan
+from jedzonko.models import Recipe, Plan, DayName, RecipePlan, Page
 
 
 class IndexView(View):
@@ -40,7 +40,14 @@ class Dashobard(View):
 def main_page(request):
     recipes = [recipe for recipe in Recipe.objects.all()]
     shuffle(recipes)
-    return render(request, "index.html", {'recipes': recipes[:3], 'active_carousel_recipe_name': recipes[0].name})
+    context = {'recipes': recipes[:3],
+               'active_carousel_recipe_name': recipes[0].name}
+    try:
+        about_slug = Page.objects.get(slug='about')
+        context['about_slug'] = about_slug
+        return render(request, "index.html", context)
+    except Page.DoesNotExist:
+        return render(request, "index.html", context)
 
 
 class RecipeDetails(View):
@@ -160,7 +167,6 @@ def plan_details(request, plan_id):
     return render(request, 'app-details-schedules.html', context)
 
 
-
 def plan_add(request):
     if request.method == 'GET':
         return render(request, 'app-add-schedules.html')
@@ -244,3 +250,11 @@ class AddMealToPlan(View):
         validate_1 = RecipePlan.objects.filter(plan=plan, meal_name=meal, day_name=day).count()
         validate_2 = RecipePlan.objects.filter(plan=plan, order=order, day_name=day).count()
         return (validate_1 + validate_2) != 0
+
+
+def about_app(request):
+    try:
+        about_slug = Page.objects.get(slug='about')
+    except Page.DoesNotExist:
+        raise Http404('Page does not exist!')
+    return render(request, 'about.html', {'about_slug': about_slug})

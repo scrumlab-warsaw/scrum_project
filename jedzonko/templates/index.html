@@ -22,7 +22,11 @@
             </a>
             <ul class="nav nounderline text-uppercase">
                 <li class="nav-item ml-4">
-                    <a class="nav-link" href="#about">o aplikacji</a>
+                    {% if about_slug %}
+                        <a class="nav-link" href="about">o aplikacji</a>
+                    {% else %}
+                        <a class="nav-link" href="#about">o aplikacji</a>
+                    {% endif %}
                 </li>
                 <li class="nav-item ml-4">
                     <a class="nav-link " href="recipe/list">Przepisy</a>
