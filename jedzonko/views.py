@@ -283,4 +283,6 @@ class ModifyPlanRecipes(View):
         }
 
         return render(request, 'modify_plan_recipes.html', context)
+    #
+    # def post(self, request, plan_id):
 

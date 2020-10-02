@@ -38,6 +38,7 @@
                 </div>
             </div>
             <div>
+            <form method="post">
                 {% for day_name , day in days %}
                     <table class="table">
                         <thead>
@@ -53,30 +54,34 @@
                             <td class="col-7">Przepis:</td>
                         </tr>
                         </thead>
-                    <tbody class="text-color-lighter">
-                        {% for recipe_plan in day %}
-                            <tr class="d-flex">
-                                <td class="col-2"><input name="meal_name" value="{{ recipe_plan.meal_name }}"></td>
-                                <td class="col-2"><input name="order" value="{{ recipe_plan.order }}" type="number">
-                                </td>
-                                <td class="col-7">
-                                    <select type="sele" name="recipe_id">
-                                        {% for recipe in recipes %}
-                                            <option value="{{ recipe.id }}" {% if recipe.id == recipe_plan.recipe.id %}
-                                                    selected {% endif %}>
-                                                {{ recipe }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                </td>
-                                <td class="col-1 end">
-                                    <a href="#" class="btn btn-danger rounded-0 text-light m-1">Usuń</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
+                            {% csrf_token %}
+                            <tbody class="text-color-lighter">
+                            {% for recipe_plan in day %}
+                                <tr class="d-flex">
+                                    <td class="col-2"><input name="meal_name" value="{{ recipe_plan.meal_name }}"></td>
+                                    <td class="col-2"><input name="order" value="{{ recipe_plan.order }}" type="number">
+                                    </td>
+                                    <td class="col-7">
+                                        <select type="sele" name="recipe_id">
+                                            {% for recipe in recipes %}
+                                                <option value="{{ recipe.id }}"
+                                                        {% if recipe.id == recipe_plan.recipe.id %}
+                                                        selected {% endif %}>
+                                                    {{ recipe }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td class="col-1 end">
+                                        <a href="#" class="btn btn-danger rounded-0 text-light m-1">Usuń</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
                     </table>
                 {% endfor %}
+                <button type="submit" class="btn btn-success rounded-0 text-light m-1">Zapisz</button>
+                </form>
             </div>
         </div>
 {% endblock content %}
