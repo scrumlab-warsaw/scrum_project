@@ -7,7 +7,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from django.views import View
 
-from jedzonko.models import Recipe, Plan, DayName, RecipePlan
+from jedzonko.models import Recipe, Plan, DayName, RecipePlan, Page
 
 
 class IndexView(View):
@@ -244,3 +244,11 @@ class AddMealToPlan(View):
         validate_1 = RecipePlan.objects.filter(plan=plan, meal_name=meal, day_name=day).count()
         validate_2 = RecipePlan.objects.filter(plan=plan, order=order, day_name=day).count()
         return (validate_1 + validate_2) != 0
+
+
+def page(request, slug):
+    if Page.objects.filter(slug=slug).count() > 0:
+        page = Page.objects.get(slug=slug)
+        return render(request, 'page.html', {'page': page})
+    else:
+        return redirect(f'/#{slug}')
