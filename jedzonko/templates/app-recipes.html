@@ -17,7 +17,7 @@
             </div>
         </div>
     <table class="table border-bottom schedules-content">
-        <thead></thead>
+        <thead>
         <tr class="d-flex text-color-darker">
             <th scope="col" class="col-1">ID</th>
             <th scope="col" class="col-2">NAZWA</th>
@@ -28,9 +28,9 @@
         <tbody class="text-color-lighter">
             {% for i,recipe in recipes_to_show %}
             <tr class="d-flex">
-                <th scope="row" class="col-1">{{ i }}</th>
+                <td class="col-1">{{ i }}</td>
                 <td class="col-2">{{ recipe.name }} 
-                    <br><font size="2">(liczba głosów: </font><font size="2" color = "#ff6600">{{ recipe.votes}})</font></td>
+                    <br><font size="2">(liczba głosów: </font><font size="2" color = "#ff6600">{{ recipe.votes}}</font><font size="2" color = "#9fa292">)</font></td>
                 <td class="col-7"> {{ recipe.description }}</td>
                 <td class="col-2 d-flex align-items-center justify-content-center flex-wrap">
                     <a href="#"
