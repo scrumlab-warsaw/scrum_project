@@ -43,7 +43,7 @@ def main_page(request):
     context = {'recipes': recipes[:3],
                'active_carousel_recipe_name': recipes[0].name}
     try:
-        about_slug = Page.objects.get(slug='about')
+        about_slug = Page.objects.get(slug='o-aplikacji')
         context['about_slug'] = about_slug
         return render(request, "index.html", context)
     except Page.DoesNotExist:
@@ -252,9 +252,9 @@ class AddMealToPlan(View):
         return (validate_1 + validate_2) != 0
 
 
-def about_app(request):
+def app_view(request):
     try:
-        about_slug = Page.objects.get(slug='about')
+        about_slug = Page.objects.get(slug='o-aplikacji')
     except Page.DoesNotExist:
         raise Http404('Page does not exist!')
     return render(request, 'about.html', {'about_slug': about_slug})
