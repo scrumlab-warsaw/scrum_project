@@ -67,13 +67,15 @@ def recipe_list(request):
 
 def plan_list(request):
     PLANS_PER_PAGE = 50
-    plans = [plan for plan in Plan.objects.all().order_by('name')]
-    plans = [(i, plan) for i, plan in enumerate(plans, 1)]
+    plans = Plan.objects.all().order_by('name')
     paginator = Paginator(plans, PLANS_PER_PAGE)
     page_number = int(request.GET.get('page', 1))
     page_obj = paginator.get_page(page_number)
     page_numbers = [i for i in range(page_number - 2, page_number + 3) if 0 < i <= ceil(len(plans) / PLANS_PER_PAGE)]
-    return render(request, 'app-schedules.html', {'page_obj': page_obj, 'page_numbers': page_numbers})
+    plans_to_show = enumerate(page_obj.object_list, page_obj.start_index())
+    return render(request, 'app-schedules.html', {'page_obj': page_obj,
+                                                  'page_numbers': page_numbers,
+                                                  'plans_to_show': plans_to_show})
 
 
 def recipe_add(request):
