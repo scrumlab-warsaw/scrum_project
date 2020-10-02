@@ -3,7 +3,7 @@ from random import shuffle
 from math import ceil
 
 from django.core.paginator import Paginator
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from django.views import View
 
@@ -102,7 +102,45 @@ def recipe_add(request):
 
 
 def recipe_modify(request, recipe_id):
-    return HttpResponse("")  # tymczasowo, do późniejszego uzupełnienia
+    try:
+        recipe = Recipe.objects.get(id=recipe_id)
+    except Recipe.DoesNotExist:
+        raise Http404('Recipe does not exist!')
+
+    if request.method == 'GET':
+        context = {'recipe': recipe}
+        return render(request, 'app-edit-recipe.html', context)
+
+    else:
+        loaded_name = request.POST.get('name')
+        loaded_description = request.POST.get('description')
+        loaded_prep_time = request.POST.get('preparation_time')
+        loaded_prep_desc = request.POST.get('preparation_description')
+        loaded_ingredients = request.POST.get('ingredients')
+
+        error_recipe = {
+            'name': loaded_name,
+            'description': loaded_description,
+            'preparation_time': loaded_prep_time,
+            'preparation_description': loaded_prep_desc,
+            'ingredients': loaded_ingredients
+        }
+
+        if (loaded_name == "" or loaded_description == "" or loaded_prep_time == "" or
+                loaded_prep_desc == "" or loaded_ingredients == ""):
+            context = {'recipe': error_recipe,
+                       'error_message': "Wypełnij poprawnie wszystkie pola."}
+            return render(request, 'app-edit-recipe.html', context)
+
+        if (Recipe.is_in_database(loaded_name, loaded_ingredients, loaded_description,
+                                  loaded_prep_desc, loaded_prep_time)):
+            context = {'recipe': error_recipe,
+                       'error_message': "Ten przepis już istnieje!"}
+            return render(request, 'app-edit-recipe.html', context)
+
+        Recipe.objects.create(name=loaded_name, ingredients=loaded_ingredients, description=loaded_description,
+                              preparation_description=loaded_prep_desc, preparation_time=loaded_prep_time)
+        return redirect('recipe_list')
 
 
 def plan_details(request, plan_id):
