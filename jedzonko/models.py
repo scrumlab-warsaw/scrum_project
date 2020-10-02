@@ -17,6 +17,13 @@ class Recipe(models.Model):
     def recipe_amount():
         return Recipe.objects.all().count()
 
+    @staticmethod
+    def is_in_database(name, ingredients, description, preparation_description, preparation_time):
+        counter = Recipe.objects.filter(name=name, ingredients=ingredients, description=description,
+                                        preparation_description=preparation_description,
+                                        preparation_time=preparation_time).count()
+        return counter > 0
+
     def ingredients_as_list(self):
         if "," in self.ingredients:
             lst = self.ingredients.split(",")
