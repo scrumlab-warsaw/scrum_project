@@ -1,11 +1,12 @@
 from datetime import datetime
 from random import shuffle
-from math import ceil
+from math import ceil, sqrt
 
 from django.core.paginator import Paginator
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from django.views import View
+from django.db import IntegrityError
 
 from jedzonko.models import Recipe, Plan, DayName, RecipePlan, Page
 
@@ -62,16 +63,17 @@ class RecipeDetails(View):
 
 
 def recipe_list(request):
-    RECIPES_PER_PAGE  = 50
+    RECIPES_PER_PAGE = 50
     recipes = Recipe.objects.all().order_by('-votes', 'created')
     paginator = Paginator(recipes, RECIPES_PER_PAGE)
     page_number = int(request.GET.get('page', 1))
     page_obj = paginator.get_page(page_number)
-    page_numbers = [i for i in range(page_number - 2, page_number + 3) if 0 < i <= ceil(len(recipes) / RECIPES_PER_PAGE)]
+    page_numbers = [i for i in range(page_number - 2, page_number + 3) if
+                    0 < i <= ceil(len(recipes) / RECIPES_PER_PAGE)]
     recipes_to_show = enumerate(page_obj.object_list, page_obj.start_index())
     return render(request, 'app-recipes.html', {'page_obj': page_obj,
-                                                  'page_numbers': page_numbers,
-                                                  'recipes_to_show': recipes_to_show})
+                                                'page_numbers': page_numbers,
+                                                'recipes_to_show': recipes_to_show})
 
 
 def plan_list(request):
@@ -167,7 +169,6 @@ def plan_details(request, plan_id):
         'meals_for_day': meals_for_day
     }
     return render(request, 'app-details-schedules.html', context)
-
 
 
 def plan_add(request):
@@ -267,21 +268,12 @@ class ModifyPlanRecipes(View):
     def get(self, request, plan_id):
         plan = Plan.objects.get(pk=plan_id)
         recipes = Recipe.objects.all()
-        plan_recipes = plan.recipeplan_set.all().order_by('-day_name__order')
-        days = []
-        for i in range(1, 8):
-            recipes_for_day = plan_recipes.filter(day_name__order=i).order_by('order')
-            if len(recipes_for_day) > 0:
-                days.append((recipes_for_day[0].day_name, recipes_for_day))
-
+        days = ModifyPlanRecipes.separate_recipe_plans(plan.recipeplan_set.all().order_by('-day_name__order'))
         context = {
-            'recipe_amount': Recipe.recipe_amount(),
-            'plan_amount': Plan.plan_amount(),
             'days': days,
             'plan': plan,
             'recipes': recipes,
         }
-
         return render(request, 'modify_plan_recipes.html', context)
 
     def post(self, request, plan_id):
@@ -289,36 +281,71 @@ class ModifyPlanRecipes(View):
         meal_names = request.POST.getlist('meal_name')
         orders = request.POST.getlist('order')
         recipe_ids = request.POST.getlist('recipe_id')
-        for meal_name, order, recipe_id in (meal_names, orders, recipe_ids):
-            if RecipePlan.objects.filter(meal_name=meal_name,
-                                         order=order,
-                                         recipe=Recipe.objects.get(pk=recipe_id),
-                                         plan=plan).count() > 1:
-                error = 'Sprawdź nazwy posiłków i ich kolejność - nie mogą się powtarzać w danym dniu'
-
-
-
-
-        print(meal_names)
-        print(orders)
-        print(recipe_ids)
-
-
-        plan = Plan.objects.get(pk=plan_id)
+        day_orders = request.POST.getlist('day_order')
+        plan_recipes = plan.recipeplan_set.all().order_by('day_name__order', 'order')
         recipes = Recipe.objects.all()
-        plan_recipes = plan.recipeplan_set.all().order_by('-day_name__order')
+
+        if not ModifyPlanRecipes.data_is_unique(meal_names, orders, day_orders):
+            plan_recipes = ModifyPlanRecipes.convert_to_dummy_recipe_plans(plan_recipes, meal_names, orders, recipe_ids)
+            error = 'Sprawdź nazwy posiłków i ich kolejność<br>Nie mogą się powtarzać w danym dniu'
+            days = []
+            for i in range(1, 8):
+                recipes_for_day = [recipe_plan for recipe_plan in plan_recipes if recipe_plan.day_name.order == i]
+                if recipes_for_day:
+                    days.append((recipes_for_day[0].day_name, recipes_for_day))
+            context = {
+                'days': days,
+                'plan': plan,
+                'recipes': recipes,
+                'error': error,
+            }
+
+            return render(request, 'modify_plan_recipes.html', context)
+
+        ModifyPlanRecipes.save_recipe_plans_data(plan_recipes, meal_names, orders, recipe_ids)
+        return redirect('plan_details', plan_id)
+
+    @staticmethod
+    def separate_recipe_plans(plan_recipes):
         days = []
         for i in range(1, 8):
             recipes_for_day = plan_recipes.filter(day_name__order=i).order_by('order')
             if len(recipes_for_day) > 0:
                 days.append((recipes_for_day[0].day_name, recipes_for_day))
+        return days
 
-        context = {
-            'recipe_amount': Recipe.recipe_amount(),
-            'plan_amount': Plan.plan_amount(),
-            'days': days,
-            'plan': plan,
-            'recipes': recipes,
-        }
+    @staticmethod
+    def data_is_unique(meal_names, orders, day_orders):
+        form_length = len(meal_names)
+        unique_meal_names_for_day = len(set(zip(meal_names, day_orders)))
+        unique_orders_for_day = len(set(zip(orders, day_orders)))
+        return form_length == unique_meal_names_for_day and form_length == unique_orders_for_day
 
-        return render(request, 'modify_plan_recipes.html', context)
+    @staticmethod
+    def convert_to_dummy_recipe_plans(plan_recipes, meal_names, orders, recipe_ids):
+        dummy_plan_recipes = []
+        for recipe_plan, meal_name, order, recipe_id in zip(plan_recipes, meal_names, orders, recipe_ids):
+            dummy_plan_recipes.append(ModifyPlanRecipes.DummyRecipePlan(meal_name, order, recipe_id, recipe_plan))
+        return dummy_plan_recipes
+
+    @staticmethod
+    def save_recipe_plans_data(plan_recipes, meal_names, orders, recipe_ids):
+        orders = [int(i) for i in orders]
+
+        for i in range(len(plan_recipes)):
+            plan_recipes[i].meal_name = sqrt(i)
+            plan_recipes[i].order = max(orders) + i + 1
+            plan_recipes[i].save()
+
+        for recipe_plan, meal_name, order, recipe_id in zip(plan_recipes, meal_names, orders, recipe_ids):
+            recipe_plan.meal_name = meal_name
+            recipe_plan.order = order
+            recipe_plan.recipe = Recipe.objects.get(pk=recipe_id)
+            recipe_plan.save()
+
+    class DummyRecipePlan:
+        def __init__(self, meal_name, order, recipe_id, recipe_plan):
+            self.meal_name = meal_name
+            self.order = order
+            self.day_name = recipe_plan.day_name
+            self.recipe = Recipe.objects.get(pk=recipe_id)

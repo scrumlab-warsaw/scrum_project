@@ -7,6 +7,7 @@
             <div class="col noPadding">
                 <h3 class="color-header text-uppercase">MODYFIKACJA PRZEPISÓW W PLANIE</h3>
             </div>
+            <div style="color:red"><b>{{ error }}</b></div>
             <div class="col d-flex justify-content-end mb-2 noPadding">
                 <td class="col-2 d-flex align-items-center justify-content-center flex-wrap">
                     <a href="/plan/list/"
@@ -72,6 +73,8 @@
                                             {% endfor %}
                                         </select>
                                     </td>
+                                    <input type="hidden" name="day_order" value="{{ recipe_plan.day_name.order }}">
+                                    <input type="hidden" name="recipe_plan_id" value="{{ recipe_plan.id }}">
                                     <td class="col-1 end">
                                         <a href="#" class="btn btn-danger rounded-0 text-light m-1">Usuń</a>
                                     </td>
