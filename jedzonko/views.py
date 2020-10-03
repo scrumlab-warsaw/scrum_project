@@ -283,6 +283,42 @@ class ModifyPlanRecipes(View):
         }
 
         return render(request, 'modify_plan_recipes.html', context)
-    #
-    # def post(self, request, plan_id):
 
+    def post(self, request, plan_id):
+        plan = Plan.objects.get(pk=plan_id)
+        meal_names = request.POST.getlist('meal_name')
+        orders = request.POST.getlist('order')
+        recipe_ids = request.POST.getlist('recipe_id')
+        for meal_name, order, recipe_id in (meal_names, orders, recipe_ids):
+            if RecipePlan.objects.filter(meal_name=meal_name,
+                                         order=order,
+                                         recipe=Recipe.objects.get(pk=recipe_id),
+                                         plan=plan).count() > 1:
+                error = 'Sprawdź nazwy posiłków i ich kolejność - nie mogą się powtarzać w danym dniu'
+
+
+
+
+        print(meal_names)
+        print(orders)
+        print(recipe_ids)
+
+
+        plan = Plan.objects.get(pk=plan_id)
+        recipes = Recipe.objects.all()
+        plan_recipes = plan.recipeplan_set.all().order_by('-day_name__order')
+        days = []
+        for i in range(1, 8):
+            recipes_for_day = plan_recipes.filter(day_name__order=i).order_by('order')
+            if len(recipes_for_day) > 0:
+                days.append((recipes_for_day[0].day_name, recipes_for_day))
+
+        context = {
+            'recipe_amount': Recipe.recipe_amount(),
+            'plan_amount': Plan.plan_amount(),
+            'days': days,
+            'plan': plan,
+            'recipes': recipes,
+        }
+
+        return render(request, 'modify_plan_recipes.html', context)
