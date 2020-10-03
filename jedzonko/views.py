@@ -264,6 +264,7 @@ def page(request, slug):
         return redirect(f'/#{slug}')
 
 
+
 class ModifyPlanRecipes(View):
     def get(self, request, plan_id):
         plan = Plan.objects.get(pk=plan_id)
@@ -349,3 +350,10 @@ class ModifyPlanRecipes(View):
             self.order = order
             self.day_name = recipe_plan.day_name
             self.recipe = Recipe.objects.get(pk=recipe_id)
+
+def delete_recipeplan(request, recipeplan_id):
+    meal = RecipePlan.objects.get(id=recipeplan_id)
+    plan = Plan.objects.get(id=meal.plan_id)
+    meal.delete()
+    return redirect(f'/plan/{plan.id}')
+

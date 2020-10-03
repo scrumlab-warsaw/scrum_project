@@ -56,7 +56,7 @@
                 <td class="col-2">{{ meal.meal_name }}</td>
                 <td class="col-7">{{ meal.recipe}}</td>
                 <td class="col-1 center">
-                    <a href="#" class="btn btn-danger rounded-0 text-light m-1">Usuń</a>
+                    <a href="/recipeplan/{{ meal.id }}/delete/" class="btn btn-danger rounded-0 text-light m-1">Usuń</a>
                 </td>
                 <td class="col-2 center">
                     <a href="{% url 'recipe_details' meal.recipe.id %}"
