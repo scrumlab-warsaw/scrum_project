@@ -62,7 +62,16 @@ class RecipeDetails(View):
 
 
 def recipe_list(request):
-    return render(request, 'app-recipes.html')
+    RECIPES_PER_PAGE  = 50
+    recipes = Recipe.objects.all().order_by('-votes', 'created')
+    paginator = Paginator(recipes, RECIPES_PER_PAGE)
+    page_number = int(request.GET.get('page', 1))
+    page_obj = paginator.get_page(page_number)
+    page_numbers = [i for i in range(page_number - 2, page_number + 3) if 0 < i <= ceil(len(recipes) / RECIPES_PER_PAGE)]
+    recipes_to_show = enumerate(page_obj.object_list, page_obj.start_index())
+    return render(request, 'app-recipes.html', {'page_obj': page_obj,
+                                                  'page_numbers': page_numbers,
+                                                  'recipes_to_show': recipes_to_show})
 
 
 def plan_list(request):
