@@ -59,8 +59,8 @@
                             <tbody class="text-color-lighter">
                             {% for recipe_plan in day %}
                                 <tr class="d-flex">
-                                    <td class="col-2"><input name="meal_name" value="{{ recipe_plan.meal_name }}"></td>
-                                    <td class="col-2"><input name="order" value="{{ recipe_plan.order }}" type="number">
+                                    <td class="col-2"><input name="meal_name" value="{{ recipe_plan.meal_name }}" required></td>
+                                    <td class="col-2"><input name="order" value="{{ recipe_plan.order }}" type="number" min="1" step="1" required>
                                     </td>
                                     <td class="col-7">
                                         <select type="sele" name="recipe_id">
