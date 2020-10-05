@@ -65,35 +65,25 @@ class RecipeDetails(View):
 def recipe_list(request):
     RECIPES_PER_PAGE = 50
 
-    if request.method == "GET":
-        recipes = Recipe.objects.all().order_by('-votes', 'created')
-        paginator = Paginator(recipes, RECIPES_PER_PAGE)
-        page_number = int(request.GET.get('page', 1))
-        page_obj = paginator.get_page(page_number)
-        page_numbers = [i for i in range(page_number - 2, page_number + 3) if
-                        0 < i <= ceil(len(recipes) / RECIPES_PER_PAGE)]
-        recipes_to_show = enumerate(page_obj.object_list, page_obj.start_index())
-        return render(request, 'app-recipes.html', {'page_obj': page_obj,
-                                                    'page_numbers': page_numbers,
-                                                    'recipes_to_show': recipes_to_show})
-    else:
-        searched = request.POST.get('recipe_name')
+    searched = request.GET.get('recipe_name')
+    if searched:
         recipes = Recipe.objects.filter(name__icontains=searched).order_by('-votes', 'created')
         if recipes.count() == 0:
             context = {'error_message': 'Nie znaleziono żadnego przepisu.'}
             return render(request, 'app-recipes.html', context)
         elif recipes.count() == 1:
             return redirect(f'/recipe/{recipes[0].id}')
-        else:
-            paginator = Paginator(recipes, RECIPES_PER_PAGE)
-            page_number = int(request.GET.get('page', 1))
-            page_obj = paginator.get_page(page_number)
-            page_numbers = [i for i in range(page_number - 2, page_number + 3) if
-                            0 < i <= ceil(len(recipes) / RECIPES_PER_PAGE)]
-            recipes_to_show = enumerate(page_obj.object_list, page_obj.start_index())
-            return render(request, 'app-recipes.html', {'page_obj': page_obj,
-                                                        'page_numbers': page_numbers,
-                                                        'recipes_to_show': recipes_to_show})
+    else:
+        recipes = Recipe.objects.all().order_by('-votes', 'created')
+    paginator = Paginator(recipes, RECIPES_PER_PAGE)
+    page_number = int(request.GET.get('page', 1))
+    page_obj = paginator.get_page(page_number)
+    page_numbers = [i for i in range(page_number - 2, page_number + 3) if
+                    0 < i <= ceil(len(recipes) / RECIPES_PER_PAGE)]
+    recipes_to_show = enumerate(page_obj.object_list, page_obj.start_index())
+    return render(request, 'app-recipes.html', {'page_obj': page_obj,
+                                                'page_numbers': page_numbers,
+                                                'recipes_to_show': recipes_to_show})
 
 
 def plan_list(request):
@@ -132,6 +122,7 @@ def recipe_add(request):
         Recipe.objects.create(name=name, ingredients=ingredients, description=description,
                               preparation_description=preparation_description,
                               preparation_time=preparation_time)
+        return redirect('recipe_list')
 
 
 def recipe_modify(request, recipe_id):
@@ -284,7 +275,6 @@ def page(request, slug):
         return redirect(f'/#{slug}')
 
 
-
 class ModifyPlanRecipes(View):
     def get(self, request, plan_id):
         plan = Plan.objects.get(pk=plan_id)
@@ -371,9 +361,9 @@ class ModifyPlanRecipes(View):
             self.day_name = recipe_plan.day_name
             self.recipe = Recipe.objects.get(pk=recipe_id)
 
+
 def delete_recipeplan(request, recipeplan_id):
     meal = RecipePlan.objects.get(id=recipeplan_id)
     plan = Plan.objects.get(id=meal.plan_id)
     meal.delete()
     return redirect(f'/plan/{plan.id}')
-
