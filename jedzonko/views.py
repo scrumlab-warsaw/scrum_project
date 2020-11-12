@@ -269,8 +269,8 @@ class AddMealToPlan(View):
 
 def page(request, slug):
     if Page.objects.filter(slug=slug).count() > 0:
-        page = Page.objects.get(slug=slug)
-        return render(request, 'page.html', {'page': page})
+        page_content = Page.objects.get(slug=slug)
+        return render(request, 'page.html', {'page': page_content})
     else:
         return redirect(f'/#{slug}')
 
@@ -298,7 +298,7 @@ class ModifyPlanRecipes(View):
 
         if not ModifyPlanRecipes.data_is_unique(meal_names, orders, day_orders):
             plan_recipes = ModifyPlanRecipes.convert_to_dummy_recipe_plans(plan_recipes, meal_names, orders, recipe_ids)
-            error = 'Sprawdź nazwy posiłków i ich kolejność<br>Nie mogą się powtarzać w danym dniu'
+            error = 'Niepoprawna nazwa lub kolejność posiłku'
             days = []
             for i in range(1, 8):
                 recipes_for_day = [recipe_plan for recipe_plan in plan_recipes if recipe_plan.day_name.order == i]
@@ -318,6 +318,11 @@ class ModifyPlanRecipes(View):
 
     @staticmethod
     def separate_recipe_plans(plan_recipes):
+        """
+        Separates RecipePlan objects to tuples with corresponding day names
+        :param plan_recipes: QyerySet of RecipePlan objects
+        :return: list of tuples (day name, RecipePlan objects for the day)
+        """
         days = []
         for i in range(1, 8):
             recipes_for_day = plan_recipes.filter(day_name__order=i).order_by('order')
@@ -327,6 +332,15 @@ class ModifyPlanRecipes(View):
 
     @staticmethod
     def data_is_unique(meal_names, orders, day_orders):
+        """
+        Checks if data presented by user does not violate unique_together constraints in model RecipePlan
+        (meal_name, day_order, plan)(order, day_order, plan)
+        :param meal_names: list of new meal_names
+        :param orders: list of new orders of meals
+        :param day_orders: list of orders of days (Monday - 1, Tuesday - 2...)
+        :return: True if data does not violate unique together constraints
+                 Fales if it violates
+        """
         form_length = len(meal_names)
         unique_meal_names_for_day = len(set(zip(meal_names, day_orders)))
         unique_orders_for_day = len(set(zip(orders, day_orders)))
@@ -334,6 +348,14 @@ class ModifyPlanRecipes(View):
 
     @staticmethod
     def convert_to_dummy_recipe_plans(plan_recipes, meal_names, orders, recipe_ids):
+        """
+        Creates DummyRecipePlan objects with given data
+        :param plan_recipes: QuerySet of RecipePlans
+        :param meal_names: list of new meal_names
+        :param orders: list of new orders of meals
+        :param recipe_ids: list of recipe ids
+        :return: list of DummyRecipePlan objects
+        """
         dummy_plan_recipes = []
         for recipe_plan, meal_name, order, recipe_id in zip(plan_recipes, meal_names, orders, recipe_ids):
             dummy_plan_recipes.append(ModifyPlanRecipes.DummyRecipePlan(meal_name, order, recipe_id, recipe_plan))
@@ -341,6 +363,14 @@ class ModifyPlanRecipes(View):
 
     @staticmethod
     def save_recipe_plans_data(plan_recipes, meal_names, orders, recipe_ids):
+        """
+        Firstly changes values of meal names and orders in the database to prevent Integrity Errors,
+        then saves RecipePlan models with the new meal names, orders, and recipes.
+        :param plan_recipes: QuerySet of RecipePlans
+        :param meal_names: list of new meal_names
+        :param orders: list of new orders of meals
+        :param recipe_ids: list of recipe ids
+        """
         orders = [int(i) for i in orders]
 
         for i in range(len(plan_recipes)):
@@ -355,6 +385,9 @@ class ModifyPlanRecipes(View):
             recipe_plan.save()
 
     class DummyRecipePlan:
+        """
+        It is used to save data from improperly filled form, and present it back to the user
+        """
         def __init__(self, meal_name, order, recipe_id, recipe_plan):
             self.meal_name = meal_name
             self.order = order
